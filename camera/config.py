@@ -1,3 +1,5 @@
 import os
 
+CAMERA_ADDRESS = "192.168.0.10"
+DCIM_DIR = "/DCIM/100OLYMP"
 SECRET_KEY = os.urandom(24)
