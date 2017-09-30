@@ -13,11 +13,11 @@ def get_json_params():
 def get_image_set():
     return set(re.findall(r",(.+\.JPG),", requests.get("http://" + app.config["CAMERA_ADDRESS"] + "/get_imglist.cgi?DIR=" + app.config["DCIM_DIR"], headers=headers).text))
 
-def exec_takemotion(id):
+def exec_takemotion(snap):
     image_set = get_image_set()
     
     print("exec_takemotion...")
-    print(requests.get("http://" + app.config["CAMERA_ADDRESS"] + "/exec_takemotion.cgi?com=newstarttake&point=400x300", headers=headers))
+    print(requests.get("http://" + app.config["CAMERA_ADDRESS"] + "/exec_takemotion.cgi?com=newstarttake&point=400x300", headers=headers).text)
    
     new_image_set = get_image_set()
     
@@ -29,12 +29,29 @@ def exec_takemotion(id):
         cnt += 1
         if cnt % 3 == 0:
             print("maybe AF is failed so re:exec takemotion...")
-            print(requests.get("http://" + app.config["CAMERA_ADDRESS"] + "/exec_takemotion.cgi?com=newstarttake&point=400x300", headers=headers))
+            print(requests.get("http://" + app.config["CAMERA_ADDRESS"] + "/exec_takemotion.cgi?com=newstarttake&point=400x300", headers=headers).text)
     
     new_filename = list(new_image_set - image_set)[0]
     
     print("image to ready!")
-    print(new_filename)
+
+    print("switching camera mode...")
+    print("to standalone")
+    print(requests.get("http://" + app.config["CAMERA_ADDRESS"] + "/switch_cameramode.cgi?mode=standalone", headers=headers).text)
+    print("to play")
+    print(requests.get("http://" + app.config["CAMERA_ADDRESS"] + "/switch_cameramode.cgi?mode=play", headers=headers).text)
+    
+    print("posting image to supsnap server...")
+
+    files = {"image": (new_filename, requests.get("http://" + app.config["CAMERA_ADDRESS"] + "/get_resizeimg.cgi?DIR=" + app.config["DCIM_DIR"] + "/" + new_filename + "&size=2560", headers=headers).content, "image/jpeg"), "thum": ("t_" + new_filename ,requests.get("http://" + app.config["CAMERA_ADDRESS"] + "/get_thumbnail.cgi?DIR=" + app.config["DCIM_DIR"] + "/" + new_filename, headers=headers).content, "image/jpeg")}
+    data = {"snap": snap}
+    print(requests.post(app.config["SUPSNAP_SERVER_ADDRESS"] + "/post_image", files=files, data=data).text)
+    
+    print("switching camera mode...")
+    print("to standalone")
+    print(requests.get("http://" + app.config["CAMERA_ADDRESS"] + "/switch_cameramode.cgi?mode=standalone", headers=headers).text)
+    print("to rec")
+    print(requests.get("http://" + app.config["CAMERA_ADDRESS"] + "/switch_cameramode.cgi?mode=rec", headers=headers).text)
 
 @app.route('/')
 def show_all():
@@ -42,7 +59,7 @@ def show_all():
 
 @app.route("/set_supsnap", methods=["GET"])
 def set_supsnap():
-    Timer(int(request.args.get("interval")), exec_takemotion, (request.args.get("id"), )).start()
+    Timer(int(request.args.get("interval")), exec_takemotion, (request.args.get("snap"), )).start()
     return "ok"
 
 @app.route("/get_image", methods=["GET"])
