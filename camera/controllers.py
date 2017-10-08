@@ -52,6 +52,8 @@ def exec_takemotion(snap):
     print(requests.get("http://" + app.config["CAMERA_ADDRESS"] + "/switch_cameramode.cgi?mode=standalone", headers=headers).text)
     print("to rec")
     print(requests.get("http://" + app.config["CAMERA_ADDRESS"] + "/switch_cameramode.cgi?mode=rec", headers=headers).text)
+    print("start live view on 5555 port...")
+    print(requests.get("http://" + app.config["CAMERA_ADDRESS"] + "/exec_takemisc.cgi?com=startliveview&port=5555&ivqty=0800x0600", headers=headers).text)
 
 @app.route('/')
 def show_all():
