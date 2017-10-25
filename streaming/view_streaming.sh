@@ -7,5 +7,4 @@ gst-launch-1.0 -vvvv \
 	! "image/jpeg, width=320, height=240" \
 	! jpegdec \
 	! "video/x-raw, width=320, height=240, framerate=3/1" \
-	! decodebin \
-	! autovideosink sync=true \
+	! autovideosink sync=false \
