@@ -18,13 +18,6 @@ def setup_camera():
             continue
     
     print("connected to camera!")
-    
-    
-    print("switch camera mode to rec...")
-    print(requests.get("http://" + app.config["CAMERA_ADDRESS"] + "/switch_cameramode.cgi?mode=rec", headers=headers).text)
-    print("start live view on 5555 port...")
-    print(requests.get("http://" + app.config["CAMERA_ADDRESS"] + "/exec_takemisc.cgi?com=startliveview&port=5555&ivqty=0800x0600", headers=headers).text)
-
 
 def regist_to_supsnap_server():
     data = {"place": app.config["PLACE_ID"], "endpoint": app.config["SELF_ADDRESS"] + "/set_supsnap"}

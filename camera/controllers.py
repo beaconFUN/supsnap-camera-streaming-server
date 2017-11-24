@@ -46,7 +46,13 @@ def exec_takemotion(snap):
     files = {"image": (new_filename, requests.get("http://" + app.config["CAMERA_ADDRESS"] + "/get_resizeimg.cgi?DIR=" + app.config["DCIM_DIR"] + "/" + new_filename + "&size=2560", headers=headers).content, "image/jpeg"), "thum": ("t_" + new_filename ,requests.get("http://" + app.config["CAMERA_ADDRESS"] + "/get_thumbnail.cgi?DIR=" + app.config["DCIM_DIR"] + "/" + new_filename, headers=headers).content, "image/jpeg")}
     data = {"snap": snap}
     print(requests.post(app.config["SUPSNAP_SERVER_ADDRESS"] + "/post_image", files=files, data=data).text)
-    
+
+@app.route('/')
+def show_all():
+    return "I'm supsnap camera server!"
+
+@app.route("/set_supsnap", methods=["GET"])
+def set_supsnap():
     print("switching camera mode...")
     print("to standalone")
     print(requests.get("http://" + app.config["CAMERA_ADDRESS"] + "/switch_cameramode.cgi?mode=standalone", headers=headers).text)
@@ -55,12 +61,6 @@ def exec_takemotion(snap):
     print("start live view on 5555 port...")
     print(requests.get("http://" + app.config["CAMERA_ADDRESS"] + "/exec_takemisc.cgi?com=startliveview&port=5555&ivqty=0800x0600", headers=headers).text)
 
-@app.route('/')
-def show_all():
-    return "I'm supsnap camera server!"
-
-@app.route("/set_supsnap", methods=["GET"])
-def set_supsnap():
     Timer(int(request.args.get("interval")), exec_takemotion, (request.args.get("snap"), )).start()
     return "ok"
 
