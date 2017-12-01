@@ -1,4 +1,4 @@
-# supsnap-camera-server
+# supsnap-camera-streaming-server
 
 ## about
 Take a snapshot and stream camera view
